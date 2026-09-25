@@ -1,0 +1,34 @@
+# Environments
+.venv/
+venv/
+
+# Python / test caches
+__pycache__/
+*.pyc
+.pytest_cache/
+.coverage
+htmlcov/
+.ruff_cache/
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Data (large images; see README to download)
+data/
+
+# MLflow tracking (regenerable)
+mlruns/
+mlruns_backup*/
+
+# Model artifacts (regenerable; keep the released production artifact decision for Day 40)
+models/*
+!models/.gitkeep
+
+# IDE/OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

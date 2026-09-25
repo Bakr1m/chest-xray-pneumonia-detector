@@ -1,0 +1,13 @@
+.venv/
+venv/
+__pycache__/
+.pytest_cache/
+mlruns/
+mlruns_backup*/
+data/
+notebooks/
+tests/
+.git/
+.vscode/
+.idea/
+*.log

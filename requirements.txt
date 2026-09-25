@@ -1,0 +1,9 @@
+# Full local stack (serving + training + dev).
+-r requirements-train.txt
+jupyter==1.1.1
+pytest==9.1.1
+ruff==0.16.9
+httpx==0.28.1
+seaborn==0.13.2
+pyarrow==25.0.1
+scipy==1.18.1

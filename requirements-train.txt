@@ -1,0 +1,8 @@
+# Training-only deps (local retraining; NOT in the Docker image).
+-r requirements-serve.txt
+matplotlib==3.11.2
+seaborn==0.13.2
+jupyter==1.1.1
+mlflow==3.16.1
+pyarrow==25.0.1
+scipy==1.18.1
