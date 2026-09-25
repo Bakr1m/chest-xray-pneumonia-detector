@@ -1,11 +1,34 @@
-"""API contract tests (in-process TestClient; synthetic PNG upload)."""
+"""API contract tests (in-process TestClient; synthetic PNG upload).
+
+Hermetic by design: a tiny SmallCNN stands in for the production weights
+(no models/ needed — that dir is gitignored), so these run anywhere.
+Production wiring (real weights file) is verified by the Docker parity check,
+not unit tests.
+"""
 import base64
 import io
 
+import pytest
 from fastapi.testclient import TestClient
 from PIL import Image
 
-from src.serve import app
+from src import serve
+from src.gradcam import GradCAM
+from src.models import SmallCNN
+
+app = serve.app
+
+
+@pytest.fixture(autouse=True)
+def tiny_model_stand_in():
+    """Install a random SmallCNN so no test touches disk artifacts."""
+    net = SmallCNN().eval()
+    serve._model = net
+    serve._explainer = GradCAM(net, "features.6")
+    yield
+    serve._model = None
+    serve._explainer = None
+
 
 client = TestClient(app)
 

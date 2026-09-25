@@ -28,12 +28,24 @@ TARGET_LAYER = "features.18"
 
 app = FastAPI(title="Chest X-Ray Pneumonia API")
 
-model = mobilenet_frozen()
-model.load_state_dict(torch.load(MODEL_PATH, weights_only=True)["state_dict"])
-model.eval()
-model.requires_grad_(True)  # flags come frozen from the constructor (Day 36)
-explainer = GradCAM(model, TARGET_LAYER)
-preprocess = eval_transforms()
+_model = None
+_explainer = None
+
+
+def get_model():
+    """Load once on first request (never at import: keeps tests hermetic and
+    turns a missing artifact into a 400, not an import-time crash)."""
+    global _model, _explainer
+    if _model is None:
+        _model = mobilenet_frozen()
+        _model.load_state_dict(torch.load(MODEL_PATH, weights_only=True)["state_dict"])
+        _model.eval()
+        _model.requires_grad_(True)  # flags come frozen from the constructor (Day 36)
+        _explainer = GradCAM(_model, TARGET_LAYER)
+    return _model, _explainer
+
+
+preprocess = eval_transforms()  # pure transform: safe at import, no disk needed
 
 
 class PredictionResponse(BaseModel):
@@ -61,6 +73,7 @@ async def predict(file: UploadFile = File(...)):  # noqa: B008 - FastAPI idiom
     except Exception as e:  # noqa: BLE001 - unreadable upload -> 400
         raise HTTPException(status_code=400, detail=f"unreadable image: {e}")
     try:
+        model, explainer = get_model()
         with torch.enable_grad():
             x = preprocess(pil_img).unsqueeze(0)
             with torch.no_grad():
