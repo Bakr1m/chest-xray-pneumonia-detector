@@ -52,7 +52,7 @@ jobs:
             curl -sf http://localhost:8000/health && break || sleep 10
           done
           curl -sf http://localhost:8000/health
-          python -c "from PIL import Image; Image.new('RGB',(200,200),(128,128,128)).save('/tmp/smoke.png')"
+          python -c "import base64; open('/tmp/smoke.png','wb').write(base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='))"
           curl -sf -X POST http://localhost:8000/predict \
             -F "file=@/tmp/smoke.png" | grep -q predicted_class
           docker stop smoke && docker rm smoke
