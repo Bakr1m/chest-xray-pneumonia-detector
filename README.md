@@ -115,6 +115,23 @@ medicine. For a meaningful result, substitute any chest X-ray PNG for the
 file; the endpoint resizes to 224×224 itself. Verified live against
 `:latest`.
 
+## Run on Kubernetes (kind, validated)
+
+```bash
+kind create cluster --name ml-portfolio
+kubectl apply -f k8s/deployment.yaml
+kubectl wait --for=condition=ready pod -l app=pneumonia-api --timeout=600s
+kubectl port-forward svc/pneumonia-api 8101:8000 &
+curl http://localhost:8101/health
+curl -X POST http://localhost:8101/predict -F "file=@example_smoke.png"
+# -> {"predicted_class":"NORMAL","confidence":0.6433,...} (validated in-cluster)
+```
+
+The manifest pins the CI-built image by digest (immutable deploy) and the
+image is offline-safe (torch hub cache pre-warmed at build), so it serves
+in clusters without external egress. To upgrade: replace the digest with a
+newer smoke-tested `:sha` build and re-apply.
+
 ## Run with Docker
 
 ```bash
