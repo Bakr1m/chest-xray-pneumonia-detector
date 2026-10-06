@@ -144,6 +144,12 @@ curl -X POST http://localhost:8000/predict -F "file=@xray.png"
    true positives) — text markers and positioning artifacts are a known
    shortcut in this dataset. Documented as the lead limitation, not tuned
    away silently.
+5. **Hidden runtime download.** `mobilenet_v2(weights=IMAGENET1K_V1)`
+   downloads base weights from pytorch.org on first construction — the
+   shipped image worked everywhere with internet and failed with 400
+   anywhere without (found deploying to an offline kind cluster). Fixed by
+   pre-warming the torchvision hub cache in a Dockerfile `RUN` step, proven
+   with a `--network none` container predicting byte-identical outputs.
 
 ## Key Learnings
 

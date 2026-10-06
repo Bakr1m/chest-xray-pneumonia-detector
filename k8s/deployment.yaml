@@ -1,0 +1,57 @@
+# Pneumonia triage API on Kubernetes.
+# Image is pinned by digest (immutable deploy): this is the CI-built,
+# smoke-tested image, not a floating tag. To upgrade, replace the digest
+# with a newer :sha build and re-apply.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pneumonia-api
+  labels:
+    app: pneumonia-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pneumonia-api
+  template:
+    metadata:
+      labels:
+        app: pneumonia-api
+    spec:
+      containers:
+        - name: api
+          image: bakr1m/pneumonia-api@sha256:f56f5ea4dafd4daa7b907e0b1e978f3d116c7c287519a7e52a24c75121417afc
+          ports:
+            - containerPort: 8000
+          resources:
+            requests:
+              cpu: 500m
+              memory: 512Mi
+            limits:
+              cpu: "2"
+              memory: 2Gi
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 15
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 60
+            periodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pneumonia-api
+spec:
+  selector:
+    app: pneumonia-api
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+  type: ClusterIP

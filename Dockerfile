@@ -28,6 +28,13 @@ RUN mkdir -p models && \
     echo "${MODEL_SHA256}  models/mobilenet_finetuned.pt" | sha256sum -c - && \
     python -c "import torch; m=torch.load('models/mobilenet_finetuned.pt', map_location='cpu', weights_only=True); print('artifact OK:', sorted(m.keys()))"
 
+# Pre-warm the torchvision hub cache: mobilenet_frozen() downloads ImageNet
+# base weights from pytorch.org on first construction. Baking the download
+# into the image keeps runtime offline-safe (air-gapped clusters, no cold-
+# start dependency on a third-party CDN). Same user (root) builds and runs,
+# so /root/.cache is found at runtime with no extra config.
+RUN python -c "import sys; sys.path.insert(0, 'src'); from models import mobilenet_frozen; mobilenet_frozen(); print('torch hub cache warmed')"
+
 EXPOSE 8000
 
 CMD ["python", "api/main.py"]
