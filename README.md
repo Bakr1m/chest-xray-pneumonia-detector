@@ -1,6 +1,4 @@
-# Project 3: Chest X-Ray Pneumonia Detector
-
-**Days 31–40 | Healthcare ML Portfolio**
+# Chest X-Ray Pneumonia Detector
 
 ## Business Context
 
@@ -20,19 +18,19 @@ never an autonomous diagnostic device.
 
 ## Approach
 
-1. **EDA** (Day 31): balance, geometry, sample grid.
-2. **Pipeline** (Day 32): train-only augmentation (flip/rotation/brightness);
+1. **EDA**: balance, geometry, sample grid.
+2. **Pipeline**: train-only augmentation (flip/rotation/brightness);
    deterministic eval; stratified val split.
-3. **Baseline** (Day 33): 3-conv SmallCNN from scratch (~150k params).
-4. **Transfer** (Day 34): frozen MobileNetV2 + new head, cached 1280-dim
+3. **Baseline**: 3-conv SmallCNN from scratch (~150k params).
+4. **Transfer**: frozen MobileNetV2 + new head, cached 1280-dim
    features (CPU-feasible: one slow pass, seconds per epoch after).
-5. **Fine-tune** (Day 35): unfreeze `features[-3:]` + head at 1e-4.
-6. **Evaluation + Grad-CAM** (Day 36): consolidated metrics; TP/TN/FP overlays
+5. **Fine-tune**: unfreeze `features[-3:]` + head at 1e-4.
+6. **Evaluation + Grad-CAM**: consolidated metrics; TP/TN/FP overlays
    with central-mass focus check.
-7. **Tracking + tests** (Day 37): MLflow `pneumonia_xray`; exact tensor-contract
+7. **Tracking + tests**: MLflow `pneumonia_xray`; exact tensor-contract
    preprocessing tests.
-8. **Serving** (Day 38): FastAPI `/predict` (class + confidence + overlay).
-9. **Container** (Day 39): 1.63 GB CPU-only image, parity-verified.
+8. **Serving**: FastAPI `/predict` (class + confidence + overlay).
+9. **Container**: 1.63 GB CPU-only image, parity-verified.
 
 ## Results
 
