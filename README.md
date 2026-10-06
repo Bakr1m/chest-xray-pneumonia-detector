@@ -97,6 +97,24 @@ make test     # 18 hermetic tests, no data/ needed
 python api/main.py   # :8000
 ```
 
+## Try It in 60 Seconds (no local setup needed)
+
+```bash
+docker pull bakr1m/pneumonia-api:latest
+docker run -d --name pneumonia -p 8003:8000 bakr1m/pneumonia-api:latest
+curl http://localhost:8003/health
+# {"status":"healthy"}
+curl -X POST http://localhost:8003/predict -F "file=@example_smoke.png"
+# -> {"predicted_class":"NORMAL","confidence":0.6433,"gradcam_png_base64":"..."}
+docker stop pneumonia && docker rm pneumonia
+```
+
+`example_smoke.png` (in this repo) is a 1×1 pixel — it proves the full
+wiring (upload → model → class + confidence + Grad-CAM overlay), not the
+medicine. For a meaningful result, substitute any chest X-ray PNG for the
+file; the endpoint resizes to 224×224 itself. Verified live against
+`:latest`.
+
 ## Run with Docker
 
 ```bash
@@ -105,6 +123,27 @@ docker run -p 8000:8000 bakr1m/pneumonia-api:latest
 curl -X POST http://localhost:8000/predict -F "file=@xray.png"
 # -> {"predicted_class":"PNEUMONIA","confidence":0.9775,"gradcam_png_base64":"..."}
 ```
+
+## Problems Encountered (Build & Deploy)
+
+1. **CI smoke assumed Pillow on the runner.** The smoke step generated its
+   test PNG with `from PIL import Image` — which runs on the GitHub runner,
+   not in the container, where Pillow isn't installed. Replaced with a
+   stdlib base64 PNG (no dependency can be missing from the standard
+   library). Lesson now applied fleet-wide: smoke scripts may only assume
+   the base runner image.
+2. **Release draft with no asset.** An interrupted upload left a draft
+   `v1.0.0` with zero assets and a tag the delete command couldn't find
+   (HTTP 422). Fixed by completing the upload in the background and
+   verifying asset state before the Dockerfile consumed it.
+3. **Torch CPU image weight.** The serving image needs torch CPU (~1.6 GB
+   total) — accepted as the price of Grad-CAM at serve time, and the reason
+   the Dockerfile installs from `requirements-serve.txt` only.
+4. **The model cheats a little.** Grad-CAM showed the most confident false
+   positive attending image borders/corners (0.26 central mass vs 0.63 for
+   true positives) — text markers and positioning artifacts are a known
+   shortcut in this dataset. Documented as the lead limitation, not tuned
+   away silently.
 
 ## Key Learnings
 
