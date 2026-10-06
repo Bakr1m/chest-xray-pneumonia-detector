@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: api
-          image: bakr1m/pneumonia-api@sha256:f56f5ea4dafd4daa7b907e0b1e978f3d116c7c287519a7e52a24c75121417afc
+          image: bakr1m/pneumonia-api@sha256:8b42a263eb5e0641a58b2b79b79b2899a36cf17cf98378147d300588a69ab594
           ports:
             - containerPort: 8000
           resources:
