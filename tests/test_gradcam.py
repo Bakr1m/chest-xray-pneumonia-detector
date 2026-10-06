@@ -16,11 +16,12 @@ def test_heatmap_shape_range():
 
 
 def test_heatmap_responds_to_input():
+    torch.manual_seed(42)  # deterministic init: unseeded weights flaked (dead ReLUs -> identical maps)
     net = SmallCNN().eval()
     cam = GradCAM(net, "features.6")
     rng = torch.random.manual_seed(0)
     h1 = cam.heatmap(torch.rand(1, 3, 224, 224, generator=rng), target_class=1)
-    h2 = cam.heatmap(torch.zeros(1, 3, 224, 224), target_class=1)
+    h2 = cam.heatmap(torch.ones(1, 3, 224, 224), target_class=1)
     assert not np.allclose(h1, h2)  # content-dependent, not constant
 
 
