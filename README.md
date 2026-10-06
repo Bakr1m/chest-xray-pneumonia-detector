@@ -100,8 +100,8 @@ python api/main.py   # :8000
 ## Run with Docker
 
 ```bash
-docker pull bakr1m/pneumonia-api:v1
-docker run -p 8000:8000 bakr1m/pneumonia-api:v1
+docker pull bakr1m/pneumonia-api:latest
+docker run -p 8000:8000 bakr1m/pneumonia-api:latest
 curl -X POST http://localhost:8000/predict -F "file=@xray.png"
 # -> {"predicted_class":"PNEUMONIA","confidence":0.9775,"gradcam_png_base64":"..."}
 ```
