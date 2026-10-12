@@ -1,0 +1,8 @@
+flowchart LR
+  A["5216 train X-rays<br/>74% pneumonia"] --> B["Train-only augment<br/>flip/rot/bright"]
+  B --> C["SmallCNN baseline<br/>150k params, 0.855 AUC"]
+  C --> D["MobileNetV2 frozen<br/>1280-d cache, 0.958 AUC"]
+  D --> E["Fine-tune last 3 feats<br/>lr 1e-4, 0.962 AUC"]
+  E --> F["Grad-CAM check<br/>TP central 0.63"]
+  F --> G["FastAPI /predict<br/>class + conf + overlay"]
+  G --> H["Docker CPU-only<br/>1.63GB + k8s/kind"]
